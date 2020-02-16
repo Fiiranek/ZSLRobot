@@ -1,7 +1,8 @@
 import RPi.GPIO as gpio 
 import time
 
-
+import sys
+import tkinter as tk
 
 def init():
     gpio.setMode(gpio.BOARD)
@@ -78,9 +79,65 @@ def pivot_right(time):
     time.sleep(time)
     gpio.cleanup()
 
-def main():
-    forward(5)
-    left(5)
+
+
+# ----------------------------------------------------
+
+def key_input(event):
+    init()
+    print 'Key: ', event.char
+    key_press = event.char
+    sleep_time = 0.03
+
+    if key_press.lower() == 'w':
+        forward(sleep_time)
+    if key_press.lower() == 's':
+        backwards(sleep_time)
+    if key_press.lower() == 'a':
+        left(sleep_time)
+    if key_press.lower() == 'd':
+        right(sleep_time)    
+
+# pivots
+    if key_press.lower() == 'q':
+        pivot_left(sleep_time)
+    if key_press.lower() == 'e':
+        pivot_right(sleep_time)
+    else:
+        pass 
+
+# ----------------------------------------------------
+def utltraSonic(measure='cm'):
+    gpdio.setup(12, gpio.OUT)
+    gpdio.setup(16, gpio.IN)
+
+    gpio.output(12,False)
+    while gpio.input(16) == 0:
+        nosig= timetim.time()
+    while gpio.input(16) == 1:
+        sig= timetim.time()
+
+    time_lenght = sig - nosig
+    if measure == 'cm':
+        distance = time_lenght / 0.000058 # dist in cm
+    elif measure == 'in'
+        distance = time_lenght / 0.000148 # dist in cm
+    else:
+        print('Unit Error')
+        distance = none
+
+    gpio.cleanup()
+    return distance
+
+# ----------------------------------------------------
+
+command = tk.Tk()
+command.bind('<key_press',key_input)
+command.mainloop()
+
+# def main():
+#     # forward(5)
+#     # left(5)
 
 
 
