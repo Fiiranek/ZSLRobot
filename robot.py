@@ -5,7 +5,7 @@ import sys
 import tkinter as tk
 
 def init():
-    gpio.setMode(gpio.BOARD)
+    gpio.setmode(gpio.BOARD)
     gpio.setup(7, gpio.OUT)
     gpio.setup(11, gpio.OUT)
     gpio.setup(13, gpio.OUT)
