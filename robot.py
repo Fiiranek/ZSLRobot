@@ -1,147 +1,100 @@
-import RPi.GPIO as gpio 
+# import curses and GPIO
+import curses
+import RPi.GPIO as GPIO
+from mpu6050 import mpu6050
 import time
+import os
+GPIO.setwarnings(False)
 
-import sys
-import tkinter as tk
+#set GPIO numbering mode and define output pins
+GPIO.setmode(GPIO.BOARD)
 
-def init():
-    gpio.setmode(gpio.BOARD)
-    gpio.setup(7, gpio.OUT)
-    gpio.setup(11, gpio.OUT)
-    gpio.setup(13, gpio.OUT)
-    gpio.setup(15, gpio.OUT)
+motor1a = 7
+motor1b = 11
+mpu = mpu6050(0x68)
+motor2a = 13
+motor2b = 16
+GPIO.cleanup()
+GPIO.setup(motor1a,GPIO.OUT)
+GPIO.setup(motor1b,GPIO.OUT)
+GPIO.setup(motor2a,GPIO.OUT)
+GPIO.setup(motor2b,GPIO.OUT)
+GPIO.setup(21, GPIO.OUT)
+pwm=GPIO.PWM(21, 50)
+pwm.start(0)
+def SetAngle(angle):
+        duty = angle / 18 + 2
+        GPIO.output(21, True)
+        pwm.ChangeDutyCycle(duty)
 
-def forward(time):
-    init()
+# Get the curses window, turn off echoing of keyboard to screen, turn on
+# instant (no waiting) key response, and use special values for cursor keys
+screen = curses.initscr()
+curses.noecho()
+curses.cbreak()
+curses.halfdelay(3)
+screen.keypad(True)
+GPIO.output(motor1a,GPIO.LOW)
+GPIO.output(motor1b,GPIO.LOW)
+GPIO.output(motor2a,GPIO.LOW)
+GPIO.output(motor2b,GPIO.LOW)
 
-    gpio.output(7,False)
-    gpio.output(11,True)
+SetAngle(90)
+try:
+        while True:
+                os.system('clear')
+                print("Temp : "+str(round(mpu.get_temp(),2)))
 
-    gpio.output(13,True)
-    gpio.output(15,False)
+                accel_data = mpu.get_accel_data()
+                print("Acc X : "+str(round(accel_data['x'],2)))
+                print("Acc Y : "+str(round(accel_data['y'],2)))
+                print("Acc Z : "+str(round(accel_data['z'],2)))
 
-    time.sleep(time)
-    gpio.cleanup()
-
-def backwards(time):
-    init()
-
-    gpio.output(11,False)
-    gpio.output(7,True)
-
-    gpio.output(15,True)
-    gpio.output(13,False)
-
-    time.sleep(time)
-    gpio.cleanup()
-
-def left(time):
-    init()
-
-    gpio.output(7,True)
-    gpio.output(11,True)
-    gpio.output(13,True)
-    gpio.output(15,False)
-
-    time.sleep(time)
-    gpio.cleanup()
-
-def right(time):
-    init()
-
-    gpio.output(7,False)
-    gpio.output(11,True)
-    gpio.output(13,False)
-    gpio.output(15,True)
-
-    time.sleep(time)
-    gpio.cleanup()
-
-def pivot_left(time):
-    init()
-
-    gpio.output(7,True)
-    gpio.output(11,False)
-    gpio.output(13,True)
-    gpio.output(15,False)
-
-    time.sleep(time)
-    gpio.cleanup()
-
-def pivot_right(time):
-    init()
-
-    gpio.output(7,False)
-    gpio.output(11,True)
-    gpio.output(13,False)
-    gpio.output(15,True)
-
-    time.sleep(time)
-    gpio.cleanup()
-
-
-
-# ----------------------------------------------------
-
-def key_input(event):
-    init()
-    print 'Key: ', event.char
-    key_press = event.char
-    sleep_time = 0.03
-
-    if key_press.lower() == 'w':
-        forward(sleep_time)
-    if key_press.lower() == 's':
-        backwards(sleep_time)
-    if key_press.lower() == 'a':
-        left(sleep_time)
-    if key_press.lower() == 'd':
-        right(sleep_time)    
-
-# pivots
-    if key_press.lower() == 'q':
-        pivot_left(sleep_time)
-    if key_press.lower() == 'e':
-        pivot_right(sleep_time)
-    else:
-        pass 
-
-# ----------------------------------------------------
-def utltraSonic(measure='cm'):
-    gpdio.setup(12, gpio.OUT)
-    gpdio.setup(16, gpio.IN)
-
-    gpio.output(12,False)
-    while gpio.input(16) == 0:
-        nosig= timetim.time()
-    while gpio.input(16) == 1:
-        sig= timetim.time()
-
-    time_lenght = sig - nosig
-    if measure == 'cm':
-        distance = time_lenght / 0.000058 # dist in cm
-    elif measure == 'in'
-        distance = time_lenght / 0.000148 # dist in cm
-    else:
-        print('Unit Error')
-        distance = none
-
-    gpio.cleanup()
-    return distance
-
-# ----------------------------------------------------
-
-command = tk.Tk()
-command.bind('<key_press',key_input)
-command.mainloop()
-
-# def main():
-#     # forward(5)
-#     # left(5)
-
-
-
-
-
-if __name__ == '__main__':
-    main()
+                gyro_data = mpu.get_gyro_data()
+                print("Gyro X : "+str(round(gyro_data['x'],2)))
+                print("Gyro Y : "+str(round(gyro_data['y'],2)))
+                print("Gyro Z : "+str(round(gyro_data['z'],2)))
+                time.sleep(0.1)
+                char = screen.getch()
+                oldChar = char
+                if char == ord('q'):
+                        break
+                elif char == curses.KEY_RIGHT:
+                        GPIO.output(motor1a,GPIO.HIGH)
+                        GPIO.output(motor1b,GPIO.LOW)
+                        GPIO.output(motor2a,GPIO.HIGH)
+                        GPIO.output(motor2b,GPIO.LOW)
+                elif char == ord('a'):
+                        SetAngle(180)
+                elif char == ord('d'):
+                        SetAngle(0)
+                elif char == ord('s'):
+                        SetAngle(90)
+                elif char == curses.KEY_LEFT:
+                        GPIO.output(motor1a,GPIO.LOW)
+                        GPIO.output(motor1b,GPIO.HIGH)
+                        GPIO.output(motor2a,GPIO.LOW)
+                        GPIO.output(motor2b,GPIO.HIGH)
+                elif char == curses.KEY_UP:
+                        GPIO.output(motor1a,GPIO.HIGH)
+                        GPIO.output(motor1b,GPIO.LOW)
+                        GPIO.output(motor2a,GPIO.LOW)
+                        GPIO.output(motor2b,GPIO.HIGH)
+                elif char == curses.KEY_DOWN:
+                        GPIO.output(motor1a,GPIO.LOW)
+                        GPIO.output(motor1b,GPIO.HIGH)
+                        GPIO.output(motor2a,GPIO.HIGH)
+                        GPIO.output(motor2b,GPIO.LOW)
+                else:
+                        GPIO.output(21, True)
+                        pwm.ChangeDutyCycle(0)
+                        GPIO.output(motor1a,GPIO.LOW)
+                        GPIO.output(motor1b,GPIO.LOW)
+                        GPIO.output(motor2a,GPIO.LOW)
+                        GPIO.output(motor2b,GPIO.LOW)
+finally:
+    #Close down curses properly, inc turn echo back on!
+        SetAngle(90)
+        curses.nocbreak(); screen.keypad(0); curses.echo()
+        curses.endwin()
+        GPIO.cleanup()
