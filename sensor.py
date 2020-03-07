@@ -1,21 +1,24 @@
 import RPi.GPIO as gpio 
 import time
 # ----------------------------------------------------
+gpio.setmode(gpio.board)
+trigger = 40
+echo = 38
 def utltraSonic(measure='cm'):
     try:
-        gpdio.setup(12, gpio.OUT)
-        gpdio.setup(16, gpio.IN)
+        gpio.setup(trigger, gpio.OUT)
+        gpio.setup(echo, gpio.IN)
 
-        gpio.output(12,False)
-        while gpio.input(16) == 0:
+        gpio.output(trigger,False)
+        while gpio.input(echo) == 0:
             nosig= timetim.time()
-        while gpio.input(16) == 1:
+        while gpio.input(echo) == 1:
             sig= timetim.time()
 
         time_lenght = sig - nosig
         if measure == 'cm':
             distance = time_lenght / 0.000058 # dist in cm
-        elif measure == 'in'
+        elif measure == 'in':
             distance = time_lenght / 0.000148 # dist in cm
         else:
             print('Unit Error')
