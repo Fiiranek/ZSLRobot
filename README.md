@@ -1,7 +1,7 @@
 # ZSLRobot
 Robot used during open days in Complex of Secondary Technical Schools of Communication Technology.
 
-!(https://photos.app.goo.gl/X42uXC3mSxWeiaW19)
+![Quick loog at the robot](https://photos.app.goo.gl/X42uXC3mSxWeiaW19)
 
 Technologies:
 - Raspberry Pi
