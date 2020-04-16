@@ -17,4 +17,4 @@ Robot used during open days in Complex of Secondary Technical Schools of Communi
 - TeowerPro Servo SG90
 - powerbank
 
-## **Franciszek Job & Andrzej Świętek**
+Franciszek Job & Andrzej Świętek
