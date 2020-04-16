@@ -1,4 +1,4 @@
-# **ZSLRobot**
+# **ZSL Robot**
 Robot used during open days in Complex of Secondary Technical Schools of Communication Technology.
 
 <img src="https://github.com/Fiiranek/ZSLRobot/blob/master/robot.jpg" width="500"/>
